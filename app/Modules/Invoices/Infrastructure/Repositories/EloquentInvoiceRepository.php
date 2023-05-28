@@ -11,4 +11,9 @@ class EloquentInvoiceRepository implements InvoiceRepositoryInterface
     {
         return Invoice::find($invoiceId);
     }
+
+    public function save(Invoice $invoice): void
+    {
+        $invoice->save();
+    }
 }
