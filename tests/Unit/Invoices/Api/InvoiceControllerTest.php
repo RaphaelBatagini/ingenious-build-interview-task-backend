@@ -37,7 +37,7 @@ class InvoiceControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testShow_ReturnsJsonResponseWithInvoiceData()
+    public function testShowReturnsJsonResponseWithInvoiceData()
 {
     // Arrange
     $invoiceId = Uuid::uuid4()->toString();
@@ -118,7 +118,7 @@ class InvoiceControllerTest extends TestCase
     $this->assertEquals(200, $response->getStatusCode());
 }
 
-    public function testShow_ReturnsJsonResponseWithErrorWhenInvoiceNotFound()
+    public function testShowReturnsJsonResponseWithErrorWhenInvoiceNotFound()
     {
         // Arrange
         $invoiceId = Uuid::uuid4()->toString();
