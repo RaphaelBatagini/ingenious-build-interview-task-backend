@@ -35,7 +35,11 @@ class InvoiceApprovalService
     {
         $invoice = $this->findInvoice($invoiceId);
 
-        $approvalDto = new ApprovalDto(Uuid::fromString($invoiceId), $invoice->status, Invoice::class);
+        $approvalDto = new ApprovalDto(
+            Uuid::fromString($invoiceId),
+            StatusEnum::from($invoice->status),
+            Invoice::class
+        );
 
         if ($status === StatusEnum::APPROVED) {
             $this->approvalFacade->approve($approvalDto);
