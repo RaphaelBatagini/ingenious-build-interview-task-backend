@@ -20,13 +20,14 @@ class InvoiceService
 
     public function getInvoiceById(string $invoiceId): InvoiceDto
     {
-        $invoice = $this->invoiceRepository->findById($invoiceId);
+        $invoice = $this->invoiceRepository
+            ->findById($invoiceId)
+            ->with(['company', 'products'])
+            ->first();
 
         if (!$invoice) {
             throw new InvoiceNotFoundException();
         }
-
-        $invoice->load('company', 'products');
 
         return $this->mapInvoiceToDto($invoice);
     }

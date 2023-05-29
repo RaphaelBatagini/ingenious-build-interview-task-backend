@@ -10,7 +10,7 @@ use App\Modules\Invoices\Application\Exceptions\InvoiceNotFoundException;
 use App\Modules\Invoices\Application\InvoiceApprovalService;
 use App\Domain\Repositories\InvoiceRepositoryInterface;
 use App\Modules\Invoices\Infrastructure\Repositories\EloquentInvoiceRepository;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 use Ramsey\Uuid\Uuid;
 
 class InvoiceApprovalServiceTest extends TestCase
