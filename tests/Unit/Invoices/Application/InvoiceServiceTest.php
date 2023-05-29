@@ -33,6 +33,12 @@ class InvoiceServiceTest extends TestCase
         $this->invoiceService = new InvoiceService($this->invoiceRepository);
     }
 
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
+
     public function testGetInvoiceByIdShouldReturnInvoiceDtoWhenInvoiceExists(): void
     {
         $invoiceId = Uuid::uuid4()->toString();

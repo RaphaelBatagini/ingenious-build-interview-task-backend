@@ -31,6 +31,12 @@ class InvoiceApprovalControllerTest extends TestCase
         $this->invoiceApprovalController = new InvoiceApprovalController($this->approvalService);
     }
 
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
+
     public function testApproveReturnsJsonResponseWithSuccessMessage(): void
     {
         $invoiceId = Uuid::uuid4()->toString();
