@@ -33,14 +33,11 @@ class InvoiceApprovalControllerTest extends TestCase
 
     public function testApproveReturnsJsonResponseWithSuccessMessage(): void
     {
-        // Arrange
         $invoiceId = Uuid::uuid4()->toString();
         $this->approvalService->shouldReceive('approveInvoice')->once()->with($invoiceId);
 
-        // Act
         $response = $this->invoiceApprovalController->approve($invoiceId);
 
-        // Assert
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(['message' => self::INVOICE_APPROVED_MESSAGE], $response->getData(true));
         $this->assertEquals(200, $response->getStatusCode());
@@ -48,15 +45,12 @@ class InvoiceApprovalControllerTest extends TestCase
 
     public function testApproveReturnsJsonResponseWithErrorWhenInvoiceNotFound(): void
     {
-        // Arrange
         $invoiceId = Uuid::uuid4()->toString();
         $this->approvalService->shouldReceive('approveInvoice')->once()->with($invoiceId)
             ->andThrow(new InvoiceNotFoundException(self::INVOICE_NOT_FOUND_ERROR));
 
-        // Act
         $response = $this->invoiceApprovalController->approve($invoiceId);
 
-        // Assert
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(['error' => self::INVOICE_NOT_FOUND_ERROR], $response->getData(true));
         $this->assertEquals(404, $response->getStatusCode());
@@ -64,15 +58,12 @@ class InvoiceApprovalControllerTest extends TestCase
 
     public function testApproveReturnsJsonResponseWithErrorWhenApprovalStatusAlreadyAssigned(): void
     {
-        // Arrange
         $invoiceId = Uuid::uuid4()->toString();
         $this->approvalService->shouldReceive('approveInvoice')->once()->with($invoiceId)
             ->andThrow(new ApprovalStatusAlreadyAssignedException(self::APPROVAL_STATUS_ALREADY_ASSIGNED_ERROR));
 
-        // Act
         $response = $this->invoiceApprovalController->approve($invoiceId);
 
-        // Assert
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(['error' => self::APPROVAL_STATUS_ALREADY_ASSIGNED_ERROR], $response->getData(true));
         $this->assertEquals(400, $response->getStatusCode());
@@ -80,14 +71,11 @@ class InvoiceApprovalControllerTest extends TestCase
 
     public function testRejectReturnsJsonResponseWithSuccessMessage(): void
     {
-        // Arrange
         $invoiceId = Uuid::uuid4()->toString();
         $this->approvalService->shouldReceive('rejectInvoice')->once()->with($invoiceId);
 
-        // Act
         $response = $this->invoiceApprovalController->reject($invoiceId);
 
-        // Assert
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(['message' => self::INVOICE_REJECTED_MESSAGE], $response->getData(true));
         $this->assertEquals(200, $response->getStatusCode());
@@ -95,15 +83,12 @@ class InvoiceApprovalControllerTest extends TestCase
 
     public function testRejectReturnsJsonResponseWithErrorWhenInvoiceNotFound(): void
     {
-        // Arrange
         $invoiceId = Uuid::uuid4()->toString();
         $this->approvalService->shouldReceive('rejectInvoice')->once()->with($invoiceId)
             ->andThrow(new InvoiceNotFoundException(self::INVOICE_NOT_FOUND_ERROR));
 
-        // Act
         $response = $this->invoiceApprovalController->reject($invoiceId);
 
-        // Assert
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(['error' => self::INVOICE_NOT_FOUND_ERROR], $response->getData(true));
         $this->assertEquals(404, $response->getStatusCode());
@@ -111,15 +96,12 @@ class InvoiceApprovalControllerTest extends TestCase
 
     public function testRejectReturnsJsonResponseWithErrorWhenApprovalStatusAlreadyAssigned(): void
     {
-        // Arrange
         $invoiceId = Uuid::uuid4()->toString();
         $this->approvalService->shouldReceive('rejectInvoice')->once()->with($invoiceId)
             ->andThrow(new ApprovalStatusAlreadyAssignedException(self::APPROVAL_STATUS_ALREADY_ASSIGNED_ERROR));
 
-        // Act
         $response = $this->invoiceApprovalController->reject($invoiceId);
 
-        // Assert
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(['error' => self::APPROVAL_STATUS_ALREADY_ASSIGNED_ERROR], $response->getData(true));
         $this->assertEquals(400, $response->getStatusCode());
