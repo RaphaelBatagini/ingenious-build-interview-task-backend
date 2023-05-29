@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Invoices\Infrastructure\Repositories;
 
 use App\Domain\Invoice;
