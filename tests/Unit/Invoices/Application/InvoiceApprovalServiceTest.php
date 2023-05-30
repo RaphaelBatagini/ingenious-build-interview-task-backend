@@ -16,9 +16,12 @@ use App\Domain\Repositories\InvoiceRepositoryInterface;
 use App\Modules\Invoices\Infrastructure\Repositories\EloquentInvoiceRepository;
 use Ramsey\Uuid\Uuid;
 use Tests\TestCase;
+use Tests\Unit\Traits\CreatesInvoices;
 
 class InvoiceApprovalServiceTest extends TestCase
 {
+    use CreatesInvoices;
+
     protected ApprovalFacadeInterface $approvalFacade;
     protected InvoiceRepositoryInterface $invoiceRepository;
     protected InvoiceApprovalService $invoiceApprovalService;
@@ -34,22 +37,9 @@ class InvoiceApprovalServiceTest extends TestCase
 
     public function testApproveInvoiceShouldUpdateInvoiceStatusAndCallApprovalFacadeWithApprovalDto(): void
     {
-        $invoice = Invoice::factory()
-            ->for(Company::factory()->create(), 'billedCompany')
-            ->hasAttached(
-                Product::factory()->count(3),
-                function ($product) {
-                    return [
-                        'id' => Uuid::uuid4()->toString(),
-                        'quantity' => 2,
-                    ];
-                },
-                'products'
-            )
-            ->approved()
-            ->create([
-                'status' => StatusEnum::DRAFT->value,
-            ]);
+        $invoice = $this->createInvoice([
+            'status' => StatusEnum::DRAFT->value,
+        ]);
 
         $this->invoiceRepository->expects($this->once())
             ->method('findById')
@@ -73,22 +63,9 @@ class InvoiceApprovalServiceTest extends TestCase
 
     public function testRejectInvoiceShouldUpdateInvoiceStatusAndCallApprovalFacadeWithApprovalDto(): void
     {
-        $invoice = Invoice::factory()
-            ->for(Company::factory()->create(), 'billedCompany')
-            ->hasAttached(
-                Product::factory()->count(3),
-                function ($product) {
-                    return [
-                        'id' => Uuid::uuid4()->toString(),
-                        'quantity' => 2,
-                    ];
-                },
-                'products'
-            )
-            ->approved()
-            ->create([
-                'status' => StatusEnum::DRAFT->value,
-            ]);
+        $invoice = $this->createInvoice([
+            'status' => StatusEnum::DRAFT->value,
+        ]);
 
         $this->invoiceRepository->expects($this->once())
             ->method('findById')

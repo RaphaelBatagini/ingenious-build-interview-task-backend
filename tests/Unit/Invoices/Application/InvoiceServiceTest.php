@@ -17,9 +17,12 @@ use App\Modules\Invoices\Infrastructure\Repositories\EloquentInvoiceRepository;
 use Mockery;
 use Ramsey\Uuid\Uuid;
 use Tests\TestCase;
+use Tests\Unit\Traits\CreatesInvoices;
 
 class InvoiceServiceTest extends TestCase
 {
+    use CreatesInvoices;
+
     protected InvoiceRepositoryInterface $invoiceRepository;
     protected InvoiceService $invoiceService;
 
@@ -41,20 +44,7 @@ class InvoiceServiceTest extends TestCase
     {
         $invoiceId = Uuid::uuid4()->toString();
 
-        $invoice = Invoice::factory()
-            ->for(Company::factory()->create(), 'billedCompany')
-            ->hasAttached(
-                Product::factory()->count(3),
-                function ($product) {
-                    return [
-                        'id' => Uuid::uuid4()->toString(),
-                        'quantity' => 2,
-                    ];
-                },
-                'products'
-            )
-            ->approved()
-            ->create();
+        $invoice = $this->createInvoice();
 
         $returnedInvoiceMock = Mockery::mock($invoice);
         $returnedInvoiceMock->shouldReceive('with')

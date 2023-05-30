@@ -15,11 +15,14 @@ use App\Modules\Invoices\Application\Dto\InvoiceDto;
 use App\Modules\Invoices\Application\Dto\ProductDto;
 use Illuminate\Http\JsonResponse;
 use Mockery;
-use Tests\TestCase;
 use Ramsey\Uuid\Uuid;
+use Tests\TestCase;
+use Tests\Unit\Traits\CreatesInvoices;
 
 class InvoiceControllerTest extends TestCase
 {
+    use CreatesInvoices;
+
     protected $invoiceService;
     protected $invoiceController;
 
@@ -39,20 +42,7 @@ class InvoiceControllerTest extends TestCase
 
     public function testShowReturnsJsonResponseWithInvoiceData()
     {
-        $invoice = Invoice::factory()
-            ->for(Company::factory()->create(), 'billedCompany')
-            ->hasAttached(
-                Product::factory()->count(3),
-                function ($product) {
-                    return [
-                        'id' => Uuid::uuid4()->toString(),
-                        'quantity' => 2,
-                    ];
-                },
-                'products'
-            )
-            ->approved()
-            ->create();
+        $invoice = $this->createInvoice();
 
         $productDtos = $invoice->products->map(function ($product) {
             return new ProductDto(
