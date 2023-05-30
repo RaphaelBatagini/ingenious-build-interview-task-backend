@@ -14,8 +14,8 @@ use App\Modules\Invoices\Application\Exceptions\InvoiceNotFoundException;
 use App\Modules\Invoices\Application\InvoiceApprovalService;
 use App\Domain\Repositories\InvoiceRepositoryInterface;
 use App\Modules\Invoices\Infrastructure\Repositories\EloquentInvoiceRepository;
-use Tests\TestCase;
 use Ramsey\Uuid\Uuid;
+use Tests\TestCase;
 
 class InvoiceApprovalServiceTest extends TestCase
 {
@@ -35,7 +35,7 @@ class InvoiceApprovalServiceTest extends TestCase
     public function testApproveInvoiceShouldUpdateInvoiceStatusAndCallApprovalFacadeWithApprovalDto(): void
     {
         $invoice = Invoice::factory()
-            ->for(Company::factory()->create())
+            ->for(Company::factory()->create(), 'billedCompany')
             ->hasAttached(
                 Product::factory()->count(3),
                 function ($product) {
@@ -74,7 +74,7 @@ class InvoiceApprovalServiceTest extends TestCase
     public function testRejectInvoiceShouldUpdateInvoiceStatusAndCallApprovalFacadeWithApprovalDto(): void
     {
         $invoice = Invoice::factory()
-            ->for(Company::factory()->create())
+            ->for(Company::factory()->create(), 'billedCompany')
             ->hasAttached(
                 Product::factory()->count(3),
                 function ($product) {

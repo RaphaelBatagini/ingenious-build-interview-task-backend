@@ -24,7 +24,7 @@ class InvoiceService
     {
         $invoice = $this->invoiceRepository
             ->findById($invoiceId)
-            ->with(['company', 'products'])
+            ->with(['billedCompany', 'products'])
             ->first();
 
         if (!$invoice) {
@@ -36,8 +36,6 @@ class InvoiceService
 
     private function mapInvoiceToDto(Invoice $invoice): InvoiceDto
     {
-        $invoiceTotalPrice = 0;
-
         $companyDto = new CompanyDto(
             $invoice->company->id,
             $invoice->company->name,
@@ -46,6 +44,16 @@ class InvoiceService
             $invoice->company->zip,
             $invoice->company->phone,
             $invoice->company->email
+        );
+
+        $billedCompanyDto = new CompanyDto(
+            $invoice->billedCompany->id,
+            $invoice->billedCompany->name,
+            $invoice->billedCompany->street,
+            $invoice->billedCompany->city,
+            $invoice->billedCompany->zip,
+            $invoice->billedCompany->phone,
+            $invoice->billedCompany->email
         );
 
         $productDtos = [];
@@ -66,6 +74,7 @@ class InvoiceService
             $invoice->date,
             $invoice->due_date,
             $companyDto,
+            $billedCompanyDto,
             $productDtos,
             $invoice->total
         );

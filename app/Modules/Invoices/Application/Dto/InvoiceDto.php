@@ -10,28 +10,31 @@ class InvoiceDto
     public $number;
     public $status;
     public $date;
-    public $due_date;
+    public $dueDate;
     public $company;
+    public $billedCompany;
     public $products;
-    public $total_price;
+    public $totalPrice;
 
     public function __construct(
         string $id,
         string $number,
         string $status,
         string $date,
-        string $due_date,
+        string $dueDate,
         CompanyDto $company,
+        CompanyDto $billedCompany,
         array $products,
-        float $total_price
+        float $totalPrice
     ) {
         $this->id = $id;
         $this->number = $number;
         $this->status = $status;
         $this->date = $date;
-        $this->due_date = $due_date;
+        $this->dueDate = $dueDate;
         $this->company = $company;
+        $this->billedCompany = $billedCompany;
         $this->products = $products;
-        $this->total_price = $total_price;
+        $this->totalPrice = $totalPrice;
     }
 }

@@ -40,7 +40,7 @@ class InvoiceControllerTest extends TestCase
     public function testShowReturnsJsonResponseWithInvoiceData()
     {
         $invoice = Invoice::factory()
-            ->for(Company::factory()->create())
+            ->for(Company::factory()->create(), 'billedCompany')
             ->hasAttached(
                 Product::factory()->count(3),
                 function ($product) {
@@ -77,7 +77,16 @@ class InvoiceControllerTest extends TestCase
                 $invoice->company->city,
                 $invoice->company->zip,
                 $invoice->company->phone,
-                $invoice->company->email,
+                $invoice->company->email
+            ),
+            new CompanyDto(
+                $invoice->billedCompany->id,
+                $invoice->billedCompany->name,
+                $invoice->billedCompany->street,
+                $invoice->billedCompany->city,
+                $invoice->billedCompany->zip,
+                $invoice->billedCompany->phone,
+                $invoice->billedCompany->email,
             ),
             $productDtos->toArray(),
             $invoice->total

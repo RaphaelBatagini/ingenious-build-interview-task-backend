@@ -42,7 +42,7 @@ class InvoiceServiceTest extends TestCase
         $invoiceId = Uuid::uuid4()->toString();
 
         $invoice = Invoice::factory()
-            ->for(Company::factory()->create())
+            ->for(Company::factory()->create(), 'billedCompany')
             ->hasAttached(
                 Product::factory()->count(3),
                 function ($product) {
@@ -59,7 +59,7 @@ class InvoiceServiceTest extends TestCase
         $returnedInvoiceMock = Mockery::mock($invoice);
         $returnedInvoiceMock->shouldReceive('with')
             ->once()
-            ->with(['company', 'products'])
+            ->with(['billedCompany', 'products'])
             ->andReturnSelf();
 
         $returnedInvoiceMock->shouldReceive('first')
@@ -97,6 +97,15 @@ class InvoiceServiceTest extends TestCase
                 $invoice->company->phone,
                 $invoice->company->email,
             ),
+            new CompanyDto(
+                $invoice->billedCompany->id,
+                $invoice->billedCompany->name,
+                $invoice->billedCompany->street,
+                $invoice->billedCompany->city,
+                $invoice->billedCompany->zip,
+                $invoice->billedCompany->phone,
+                $invoice->billedCompany->email,
+            ),
             $productDtos->toArray(),
             $invoice->total
         );
@@ -111,7 +120,7 @@ class InvoiceServiceTest extends TestCase
         $returnedInvoiceMock = Mockery::mock(Invoice::class);
         $returnedInvoiceMock->shouldReceive('with')
             ->once()
-            ->with(['company', 'products'])
+            ->with(['billedCompany', 'products'])
             ->andReturnSelf();
 
         $returnedInvoiceMock->shouldReceive('first')

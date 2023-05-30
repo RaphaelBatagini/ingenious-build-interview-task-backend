@@ -10,7 +10,7 @@ class CompanyDto
     public $name;
     public $street;
     public $city;
-    public $zip_code;
+    public $zipCode;
     public $phone;
     public $email;
 
@@ -19,7 +19,7 @@ class CompanyDto
         string $name,
         string $street,
         string $city,
-        string $zip_code,
+        string $zipCode,
         string $phone,
         string $email
     ) {
@@ -27,7 +27,7 @@ class CompanyDto
         $this->name = $name;
         $this->street = $street;
         $this->city = $city;
-        $this->zip_code = $zip_code;
+        $this->zipCode = $zipCode;
         $this->phone = $phone;
         $this->email = $email;
     }

@@ -6,11 +6,11 @@ namespace App\Domain;
 
 use App\Domain\Company;
 use App\Domain\Product;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Config;
 
 class Invoice extends Model
 {
@@ -21,18 +21,25 @@ class Invoice extends Model
     public $incrementing = false;
     protected $guarded = [];
 
-    protected function total(): Attribute
+    public function getTotalAttribute(): int
     {
-        return Attribute::make(
-            get: fn ($value, $attributes) => $this->products()->get()->sum(
-                fn ($product) => $product['price'] * $product['pivot']['quantity']
-            ),
+        return $this->products()->get()->sum(
+            fn ($product) => $product['price'] * $product['pivot']['quantity']
         );
     }
 
-    public function company(): BelongsTo
+    public function getCompanyAttribute(): Company
     {
-        return $this->belongsTo(Company::class);
+        $companyData = array_merge(['id' => '0'], Config::get('company'));
+
+        return new Company(
+            $companyData
+        );
+    }
+
+    public function billedCompany(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function products(): BelongsToMany
