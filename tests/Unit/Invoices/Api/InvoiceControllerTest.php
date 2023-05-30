@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Invoices\Api;
 
-use App\Domain\Company;
-use App\Domain\Invoice;
-use App\Domain\Product;
 use App\Modules\Invoices\Api\InvoiceController;
 use App\Modules\Invoices\Application\Exceptions\InvoiceNotFoundException;
 use App\Modules\Invoices\Application\InvoiceService;

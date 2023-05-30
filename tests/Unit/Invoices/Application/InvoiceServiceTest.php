@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Modules\Invoices\Application;
 
-use App\Domain\Company;
 use App\Domain\Invoice;
-use App\Domain\Product;
 use App\Domain\Repositories\InvoiceRepositoryInterface;
 use App\Modules\Invoices\Application\Dto\CompanyDto;
 use App\Modules\Invoices\Application\Dto\InvoiceDto;
