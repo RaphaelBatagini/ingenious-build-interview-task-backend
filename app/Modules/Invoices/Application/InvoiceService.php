@@ -39,6 +39,7 @@ class InvoiceService
         $invoiceTotalPrice = 0;
 
         $companyDto = new CompanyDto(
+            $invoice->company->id,
             $invoice->company->name,
             $invoice->company->street,
             $invoice->company->city,
@@ -50,22 +51,23 @@ class InvoiceService
         $productDtos = [];
         foreach ($invoice->products as $product) {
             $productDto = new ProductDto(
+                $product->id,
                 $product->name,
                 $product->pivot->quantity,
                 $product->price
             );
             $productDtos[] = $productDto;
-            $invoiceTotalPrice += $productDto->total;
         }
 
         return new InvoiceDto(
+            $invoice->id,
             $invoice->number,
             $invoice->status,
             $invoice->date,
             $invoice->due_date,
             $companyDto,
             $productDtos,
-            $invoiceTotalPrice
+            $invoice->total
         );
     }
 }

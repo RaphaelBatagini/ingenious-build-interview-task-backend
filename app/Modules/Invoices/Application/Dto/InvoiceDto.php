@@ -6,6 +6,7 @@ namespace App\Modules\Invoices\Application\Dto;
 
 class InvoiceDto
 {
+    public $id;
     public $number;
     public $status;
     public $date;
@@ -15,6 +16,7 @@ class InvoiceDto
     public $total_price;
 
     public function __construct(
+        string $id,
         string $number,
         string $status,
         string $date,
@@ -23,6 +25,7 @@ class InvoiceDto
         array $products,
         float $total_price
     ) {
+        $this->id = $id;
         $this->number = $number;
         $this->status = $status;
         $this->date = $date;

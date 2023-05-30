@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tests\Unit\Modules\Invoices\Application;
 
 use App\Domain\Enums\StatusEnum;
+use App\Domain\Company;
 use App\Domain\Invoice;
+use App\Domain\Product;
 use App\Modules\Approval\Api\ApprovalFacadeInterface;
 use App\Modules\Approval\Api\Dto\ApprovalDto;
 use App\Modules\Invoices\Application\Exceptions\InvoiceNotFoundException;
@@ -32,17 +34,30 @@ class InvoiceApprovalServiceTest extends TestCase
 
     public function testApproveInvoiceShouldUpdateInvoiceStatusAndCallApprovalFacadeWithApprovalDto(): void
     {
-        $invoiceId = Uuid::uuid4()->toString();
-        $invoice = new Invoice();
-        $invoice->status = StatusEnum::DRAFT->value;
+        $invoice = Invoice::factory()
+            ->for(Company::factory()->create())
+            ->hasAttached(
+                Product::factory()->count(3),
+                function ($product) {
+                    return [
+                        'id' => Uuid::uuid4()->toString(),
+                        'quantity' => 2,
+                    ];
+                },
+                'products'
+            )
+            ->approved()
+            ->create([
+                'status' => StatusEnum::DRAFT->value,
+            ]);
 
         $this->invoiceRepository->expects($this->once())
             ->method('findById')
-            ->with($invoiceId)
+            ->with($invoice->id)
             ->willReturn($invoice);
 
         $approvalDto = new ApprovalDto(
-            Uuid::fromString($invoiceId),
+            Uuid::fromString($invoice->id),
             StatusEnum::DRAFT,
             Invoice::class
         );
@@ -51,24 +66,37 @@ class InvoiceApprovalServiceTest extends TestCase
             ->method('approve')
             ->with($approvalDto);
 
-        $this->invoiceApprovalService->approveInvoice($invoiceId);
+        $this->invoiceApprovalService->approveInvoice($invoice->id);
 
         $this->assertSame(StatusEnum::APPROVED, $invoice->status);
     }
 
     public function testRejectInvoiceShouldUpdateInvoiceStatusAndCallApprovalFacadeWithApprovalDto(): void
     {
-        $invoiceId = Uuid::uuid4()->toString();
-        $invoice = new Invoice();
-        $invoice->status = StatusEnum::DRAFT->value;
+        $invoice = Invoice::factory()
+            ->for(Company::factory()->create())
+            ->hasAttached(
+                Product::factory()->count(3),
+                function ($product) {
+                    return [
+                        'id' => Uuid::uuid4()->toString(),
+                        'quantity' => 2,
+                    ];
+                },
+                'products'
+            )
+            ->approved()
+            ->create([
+                'status' => StatusEnum::DRAFT->value,
+            ]);
 
         $this->invoiceRepository->expects($this->once())
             ->method('findById')
-            ->with($invoiceId)
+            ->with($invoice->id)
             ->willReturn($invoice);
 
         $approvalDto = new ApprovalDto(
-            Uuid::fromString($invoiceId),
+            Uuid::fromString($invoice->id),
             StatusEnum::DRAFT,
             Invoice::class
         );
@@ -77,7 +105,7 @@ class InvoiceApprovalServiceTest extends TestCase
             ->method('reject')
             ->with($approvalDto);
 
-        $this->invoiceApprovalService->rejectInvoice($invoiceId);
+        $this->invoiceApprovalService->rejectInvoice($invoice->id);
 
         $this->assertSame(StatusEnum::REJECTED, $invoice->status);
     }

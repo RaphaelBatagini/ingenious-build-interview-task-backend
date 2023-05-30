@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Invoices\Api;
 
+use App\Domain\Company;
+use App\Domain\Invoice;
+use App\Domain\Product;
 use App\Modules\Invoices\Api\InvoiceController;
 use App\Modules\Invoices\Application\Exceptions\InvoiceNotFoundException;
 use App\Modules\Invoices\Application\InvoiceService;
@@ -36,77 +39,62 @@ class InvoiceControllerTest extends TestCase
 
     public function testShowReturnsJsonResponseWithInvoiceData()
     {
-        $invoiceId = Uuid::uuid4()->toString();
-        $invoiceData = [
-            'number' => 'INV-001',
-            'status' => 'paid',
-            'date' => '2022-01-01',
-            'due_date' => '2022-01-31',
-            'company' => [
-                'name' => 'ABC Company',
-                'street' => '123 Main St',
-                'city' => 'City',
-                'zip_code' => '12345',
-                'phone' => '123-456-7890',
-                'email' => 'someone@someemail.com',
-            ],
-            'products' => [
-                [
-                    'name' => 'Product A',
-                    'quantity' => 2,
-                    'price' => 10.99,
-                    'total' => 21.98,
-                ],
-                [
-                    'name' => 'Product B',
-                    'quantity' => 1,
-                    'price' => 5.99,
-                    'total' => 5.99,
-                ],
-            ],
-            'total_price' => 27.97,
-        ];
+        $invoice = Invoice::factory()
+            ->for(Company::factory()->create())
+            ->hasAttached(
+                Product::factory()->count(3),
+                function ($product) {
+                    return [
+                        'id' => Uuid::uuid4()->toString(),
+                        'quantity' => 2,
+                    ];
+                },
+                'products'
+            )
+            ->approved()
+            ->create();
+
+        $productDtos = $invoice->products->map(function ($product) {
+            return new ProductDto(
+                $product->id,
+                $product->name,
+                $product->pivot->quantity,
+                $product->price,
+                $product->total
+            );
+        });
 
         $invoiceDto = new InvoiceDto(
-            $invoiceData['number'],
-            $invoiceData['status'],
-            $invoiceData['date'],
-            $invoiceData['due_date'],
+            $invoice->id,
+            $invoice->number,
+            $invoice->status,
+            $invoice->date,
+            $invoice->due_date,
             new CompanyDto(
-                $invoiceData['company']['name'],
-                $invoiceData['company']['street'],
-                $invoiceData['company']['city'],
-                $invoiceData['company']['zip_code'],
-                $invoiceData['company']['phone'],
-                $invoiceData['company']['email'],
+                $invoice->company->id,
+                $invoice->company->name,
+                $invoice->company->street,
+                $invoice->company->city,
+                $invoice->company->zip,
+                $invoice->company->phone,
+                $invoice->company->email,
             ),
-            [
-                new ProductDto(
-                    $invoiceData['products'][0]['name'],
-                    $invoiceData['products'][0]['quantity'],
-                    $invoiceData['products'][0]['price'],
-                    $invoiceData['products'][0]['total']
-                ),
-                new ProductDto(
-                    $invoiceData['products'][1]['name'],
-                    $invoiceData['products'][1]['quantity'],
-                    $invoiceData['products'][1]['price'],
-                    $invoiceData['products'][1]['total']
-                ),
-            ],
-            $invoiceData['total_price']
+            $productDtos->toArray(),
+            $invoice->total
         );
+
+        $expectedInvoiceObject = json_decode(json_encode($invoiceDto), true);
 
         $this->invoiceService
             ->shouldReceive('getInvoiceById')
             ->once()
-            ->with($invoiceId)
+            ->with($invoice->id)
             ->andReturn($invoiceDto);
 
-        $response = $this->invoiceController->show($invoiceId);
+        $response = $this->invoiceController->show($invoice->id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals($invoiceData, $response->getData(true));
+        $this->assertEquals($expectedInvoiceObject, $response->getData(true));
         $this->assertEquals(200, $response->getStatusCode());
     }
 

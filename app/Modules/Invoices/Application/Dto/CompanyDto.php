@@ -6,6 +6,7 @@ namespace App\Modules\Invoices\Application\Dto;
 
 class CompanyDto
 {
+    public $id;
     public $name;
     public $street;
     public $city;
@@ -14,6 +15,7 @@ class CompanyDto
     public $email;
 
     public function __construct(
+        string $id,
         string $name,
         string $street,
         string $city,
@@ -21,6 +23,7 @@ class CompanyDto
         string $phone,
         string $email
     ) {
+        $this->id = $id;
         $this->name = $name;
         $this->street = $street;
         $this->city = $city;
