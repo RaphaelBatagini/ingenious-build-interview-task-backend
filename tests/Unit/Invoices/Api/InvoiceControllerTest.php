@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Invoices\Api;
 
-use App\Domain\Company;
-use App\Domain\Invoice;
-use App\Domain\Product;
 use App\Modules\Invoices\Api\InvoiceController;
 use App\Modules\Invoices\Application\Exceptions\InvoiceNotFoundException;
 use App\Modules\Invoices\Application\InvoiceService;
-use App\Modules\Invoices\Application\Dto\CompanyDto;
-use App\Modules\Invoices\Application\Dto\InvoiceDto;
-use App\Modules\Invoices\Application\Dto\ProductDto;
+use App\Modules\Invoices\Mappers\InvoiceMapper;
 use Illuminate\Http\JsonResponse;
 use Mockery;
-use Tests\TestCase;
 use Ramsey\Uuid\Uuid;
+use Tests\TestCase;
+use Tests\Unit\Traits\CreatesInvoices;
 
 class InvoiceControllerTest extends TestCase
 {
+    use CreatesInvoices;
+
     protected $invoiceService;
     protected $invoiceController;
 
@@ -39,49 +37,9 @@ class InvoiceControllerTest extends TestCase
 
     public function testShowReturnsJsonResponseWithInvoiceData()
     {
-        $invoice = Invoice::factory()
-            ->for(Company::factory()->create())
-            ->hasAttached(
-                Product::factory()->count(3),
-                function ($product) {
-                    return [
-                        'id' => Uuid::uuid4()->toString(),
-                        'quantity' => 2,
-                    ];
-                },
-                'products'
-            )
-            ->approved()
-            ->create();
+        $invoice = $this->createInvoice();
 
-        $productDtos = $invoice->products->map(function ($product) {
-            return new ProductDto(
-                $product->id,
-                $product->name,
-                $product->pivot->quantity,
-                $product->price,
-                $product->total
-            );
-        });
-
-        $invoiceDto = new InvoiceDto(
-            $invoice->id,
-            $invoice->number,
-            $invoice->status,
-            $invoice->date,
-            $invoice->due_date,
-            new CompanyDto(
-                $invoice->company->id,
-                $invoice->company->name,
-                $invoice->company->street,
-                $invoice->company->city,
-                $invoice->company->zip,
-                $invoice->company->phone,
-                $invoice->company->email,
-            ),
-            $productDtos->toArray(),
-            $invoice->total
-        );
+        $invoiceDto = InvoiceMapper::toDto($invoice);
 
         $expectedInvoiceObject = json_decode(json_encode($invoiceDto), true);
 
