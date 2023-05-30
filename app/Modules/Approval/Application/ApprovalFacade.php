@@ -9,8 +9,8 @@ use App\Modules\Approval\Api\ApprovalFacadeInterface;
 use App\Modules\Approval\Api\Dto\ApprovalDto;
 use App\Modules\Approval\Api\Events\EntityApproved;
 use App\Modules\Approval\Api\Events\EntityRejected;
+use App\Modules\Approval\Application\Exceptions\ApprovalStatusAlreadyAssignedException;
 use Illuminate\Contracts\Events\Dispatcher;
-use LogicException;
 
 final readonly class ApprovalFacade implements ApprovalFacadeInterface
 {
@@ -38,7 +38,7 @@ final readonly class ApprovalFacade implements ApprovalFacadeInterface
     private function validate(ApprovalDto $dto): void
     {
         if (StatusEnum::DRAFT !== StatusEnum::tryFrom($dto->status->value)) {
-            throw new LogicException('approval status is already assigned');
+            throw new ApprovalStatusAlreadyAssignedException();
         }
     }
 }
